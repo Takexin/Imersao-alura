@@ -1,28 +1,44 @@
-#Importing the API
+#Importando as APIs e bibliotecas
 import google.generativeai as genai
+from pvrecorder import PvRecorder
+import wave
+import struct
+import tkinter as tk
 
-#desafio: O que vc quiser, regras: relacao com conteudo da imersao, usar a api do google,
-#pode criar quantos projetos quiser,
-#avaliacao por github,
-#sabado as 23:59 data de entrega,
-#pegar os 30 melhores projetos votados pelo povo no discord
-#nao pode conteudo de odio ou algo inapropriado
-#notas: utilidade, criatividade, eficacia(quao bem resolve o problema), apresentacao
-
-#putting in the API key
+#Configurando a API key
 genai.configure(api_key="AIzaSyCG9H9NOaY3yXzyUQSvqVDcr_pIVD9cWFA")
 
-#Listing all possible models
-for m in genai.list_models():
-    if 'generateContent' in m.supported_generation_methods:
-        print(m.name)
-"""gemini pro: just text
-#pro vision: multimodal
-#gemini 1.0 pro: most stable version(currently)
-#0.001: more experimental features
-#latest: most recent"""
+#Criando instancia do pvrecorder
+recorder = PvRecorder(device_index=-1, frame_length=512)
+audio = []
 
-#setting up settings for the model
+#Captando audio do microfone
+def gravar_audio():
+    try:
+        recorder.start()
+        print('fale')
+        while True:
+            frame = recorder.read()
+            audio.extend(frame)
+    except KeyboardInterrupt:
+        recorder.stop()
+        with wave.open('audio.wav', 'w') as f:
+            f.setparams((1, 2, 16000, 512, 'NONE', 'NONE'))
+            f.writeframes(struct.pack('h' * len(audio), *audio))
+    finally:
+        recorder.delete()
+def janela(texto):
+    root = tk.Tk()
+    root.title("Tkinter Example")
+    root.geometry('400x200')
+
+    # criando botao 
+    button = tk.Button(root, text="Run Blank Function", command=gravar_audio())
+    button.pack()
+
+    root.mainloop()
+
+#Configurando o chatbot
 generation_config = {
     "candidate_count": 1,
     "temperature": 0.5,
@@ -33,15 +49,17 @@ safety_settings = {
     "SEXUAL": "BLOCK_NONE",
     "DANGEROUS": "BLOCK_NONE"
 }
-#choosing the model we want
+#Escolhendo o modelo
 model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
                               generation_config=generation_config,
                               safety_settings=safety_settings,
                               system_instruction="Você fala como um homem heterotop super exagerado, utilizando constantemente gírias e termos de academia.")
 chat = model.start_chat(history=[])
-prompt = input("Waiting for prompt: ")
-
-while prompt != "finish":
-    response = chat.send_message(prompt)
+prompt = input("Aperte 'enter' para começar: ")
+while prompt != "terminar":
+    gravar_audio()
+    response = chat.send_message(genai.upload_file('audio.wav'))
     print("Response: ", "\n", response.text, "\n")
-    prompt = input("Waiting for prompt: ")
+    recorder = PvRecorder(device_index=-1, frame_length=512)
+    prompt = input("escreva 'terminar' para finalizar, ou aperte 'enter' para continuar: ")
+
