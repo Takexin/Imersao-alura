@@ -1,54 +1,47 @@
-"""
-At the command line, only need to run once to install the package via pip:
-
-$ pip install google-generativeai
-"""
-
+#Importing the API
 import google.generativeai as genai
 
+#desafio: O que vc quiser, regras: relacao com conteudo da imersao, usar a api do google,
+#pode criar quantos projetos quiser,
+#avaliacao por github,
+#sabado as 23:59 data de entrega,
+#pegar os 30 melhores projetos votados pelo povo no discord
+#nao pode conteudo de odio ou algo inapropriado
+#notas: utilidade, criatividade, eficacia(quao bem resolve o problema), apresentacao
+
+#putting in the API key
 genai.configure(api_key="AIzaSyCG9H9NOaY3yXzyUQSvqVDcr_pIVD9cWFA")
 
-# Set up the model
+#Listing all possible models
+for m in genai.list_models():
+    if 'generateContent' in m.supported_generation_methods:
+        print(m.name)
+"""gemini pro: just text
+#pro vision: multimodal
+#gemini 1.0 pro: most stable version(currently)
+#0.001: more experimental features
+#latest: most recent"""
+
+#setting up settings for the model
 generation_config = {
-  "temperature": 1,
-  "top_p": 1,
-  "top_k": 0,
-  "max_output_tokens": 2048,
+    "candidate_count": 1,
+    "temperature": 0.5,
 }
-
-safety_settings = [
-  {
-    "category": "HARM_CATEGORY_HARASSMENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    "category": "HARM_CATEGORY_HATE_SPEECH",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  },
-]
-
-model = genai.GenerativeModel(model_name="gemini-1.0-pro",
+safety_settings = {
+    "HARASSMENT": "BLOCK_NONE",
+    "HATE": "BLOCK_NONE",
+    "SEXUAL": "BLOCK_NONE",
+    "DANGEROUS": "BLOCK_NONE"
+}
+#choosing the model we want
+model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
                               generation_config=generation_config,
-                              safety_settings=safety_settings)
+                              safety_settings=safety_settings,
+                              system_instruction="Você fala como um homem heterotop super exagerado, utilizando constantemente gírias e termos de academia.")
+chat = model.start_chat(history=[])
+prompt = input("Waiting for prompt: ")
 
-convo = model.start_chat(history=[
-  {
-    "role": "user",
-    "parts": ["Send me the alphabet, but which letter has a random word attached to it"]
-  },
-  {
-    "role": "model",
-    "parts": ["A - Avocado\nB - Bee\nC - Cup\nD - Dog\nE - Elephant\nF - Fish\nG - Giraffe\nH - Hat\nI - Ice cream\nJ - Jellyfish\nK - Kite\nL - Lion\nM - Monkey\nN - Nest\nO - Octopus\nP - Pig\nQ - Queen\nR - Rabbit\nS - Snake\nT - Tiger\nU - Umbrella\nV - Violin\nW - Whale\nX - Xylophone\nY - Yacht\nZ - Zebra"]
-  },
-])
-
-convo.send_message("YOUR_USER_INPUT")
-print(convo.last.text)
+while prompt != "finish":
+    response = chat.send_message(prompt)
+    print("Response: ", "\n", response.text, "\n")
+    prompt = input("Waiting for prompt: ")
