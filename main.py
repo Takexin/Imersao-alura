@@ -27,16 +27,6 @@ def gravar_audio():
             f.writeframes(struct.pack('h' * len(audio), *audio))
     finally:
         recorder.delete()
-def janela(texto):
-    root = tk.Tk()
-    root.title("Tkinter Example")
-    root.geometry('400x200')
-
-    # criando botao 
-    button = tk.Button(root, text="Run Blank Function", command=gravar_audio())
-    button.pack()
-
-    root.mainloop()
 
 #Configurando o chatbot
 generation_config = {
