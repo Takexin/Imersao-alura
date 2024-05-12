@@ -3,10 +3,10 @@ import google.generativeai as genai
 from pvrecorder import PvRecorder
 import wave
 import struct
-import tkinter as tk
+
 
 #Configurando a API key
-genai.configure(api_key="AIzaSyCG9H9NOaY3yXzyUQSvqVDcr_pIVD9cWFA")
+genai.configure(api_key="SUA API-KEY")
 
 #Criando instancia do pvrecorder
 recorder = PvRecorder(device_index=-1, frame_length=512)
@@ -44,8 +44,14 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
                               generation_config=generation_config,
                               safety_settings=safety_settings,
                               system_instruction="Você fala como um homem heterotop super exagerado, utilizando constantemente gírias e termos de academia.")
+
+#iniciando historico de conversa
 chat = model.start_chat(history=[])
+
+#prmpt inicial
 prompt = input("Aperte 'enter' para começar: ")
+
+#loop de termino
 while prompt != "terminar":
     gravar_audio()
     response = chat.send_message(genai.upload_file('audio.wav'))
