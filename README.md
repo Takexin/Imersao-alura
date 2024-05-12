@@ -1,0 +1,2 @@
+Conversa com chatbot virtual, treinador de academia com propósito de te passar os melhores conselhos. Sejam eles dicas de alimentação, ou até mesmo como treinar, tudo por comando de voz!
+Comandos importantes: Após terminar a sua fala, aperte o comando Ctrl + C uma vez para fazer o processamento da sua fala. Aperte enter para continuar a sua conversa, ou digite 'terminar' para acabar com a conversa
