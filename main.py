@@ -4,6 +4,13 @@ from pvrecorder import PvRecorder
 import wave
 import struct
 
+
+
+
+
+
+
+
 parar_de_gravar = False
 
 #Configurando a API key
@@ -38,6 +45,7 @@ def parar_audio():
     return parar_de_gravar
 
 def teste_gravar():
+    global parar_de_gravar
     try:
         recorder.start()
         print('fale')
@@ -52,10 +60,12 @@ def teste_gravar():
         with wave.open('audio.wav', 'w') as f:
             f.setparams((1, 2, 16000, 512, 'NONE', 'NONE'))
             f.writeframes(struct.pack('h' * len(audio), *audio))
+            parar_de_gravar = False
     finally:
         pass
 
 def conversa():
+    global recorder
     #Configurando o chatbot
     generation_config = {
         "candidate_count": 1,
@@ -75,4 +85,4 @@ def conversa():
     chat = model.start_chat(history=[])   
     response = chat.send_message(genai.upload_file('audio.wav'))
     recorder = PvRecorder(device_index=-1, frame_length=512)
-    return response.text
+    return response.text()
